@@ -311,7 +311,7 @@ async function refreshData() {
   overlay.style.display = 'flex';
 
   try {
-    const res = await fetch('https://eugene-represent-authorized-holiday.trycloudflare.com/api/pu-data');
+    const res = await fetch('/.netlify/functions/pu-data');
     if (!res.ok) throw new Error(`API error ${res.status}`);
     const json = await res.json();
 

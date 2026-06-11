@@ -1,0 +1,7 @@
+{
+  "name": "pu-data",
+  "version": "1.0.0",
+  "dependencies": {
+    "@aws-sdk/client-athena": "^3.600.0"
+  }
+}
