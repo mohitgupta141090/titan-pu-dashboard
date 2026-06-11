@@ -90,7 +90,13 @@ exports.handler = async (event) => {
   }
 
   try {
-    const client = new AthenaClient({ region: REGION });
+    const client = new AthenaClient({
+      region: process.env.TITAN_AWS_REGION || REGION,
+      credentials: {
+        accessKeyId: process.env.TITAN_AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.TITAN_AWS_SECRET_ACCESS_KEY,
+      },
+    });
 
     // Run all 7 partner queries in parallel
     const results = await Promise.all(
