@@ -9,7 +9,15 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 24px; }
   h1 { color: #1a202c; font-size: 20px; margin-bottom: 4px; }
-  .subtitle { color: #718096; font-size: 12px; margin-bottom: 20px; }
+  .subtitle { color: #718096; font-size: 12px; }
+  .header-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 16px; }
+  .refresh-btn { padding: 8px 18px; background: #4f46e5; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .refresh-btn:hover { background: #4338ca; }
+  .refresh-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  #loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.88); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+  #loading-overlay p { color: #4a5568; font-size: 14px; font-weight: 500; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { font-size: 40px; display: inline-block; animation: spin 1s linear infinite; }
 
   .tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 0; }
   .tab-btn {
@@ -41,8 +49,15 @@
 </head>
 <body>
 
-<h1>Premium &amp; Ultra Plan Uptake Dashboard</h1>
-<p class="subtitle">P/U Conversion % · Dec 2025–Jun 2026 · Excl. Migration · Mailbox created = 1 applied to Bluehost &amp; HostGator US only</p>
+<div id="loading-overlay"><span class="spinner">↻</span><p>Fetching fresh data from Athena…</p></div>
+
+<div class="header-row">
+  <div>
+    <h1>Premium &amp; Ultra Plan Uptake Dashboard</h1>
+    <p class="subtitle" id="subtitle">P/U Conversion % · Dec 2025–Jun 2026 · Excl. Migration · Mailbox created = 1 applied to Bluehost &amp; HostGator US only</p>
+  </div>
+  <button class="refresh-btn" id="refresh-btn" onclick="refreshData()">↻ Refresh Data</button>
+</div>
 
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab(0)">Hostinger</button>
@@ -140,10 +155,10 @@ const partners = [
   { name: 'HostGator LatAm',  data: [16.33, 19.86, 17.54, 18.73, 19.35, 20.70, 20.30], color: '#db2777', mbx: false },
 ];
 
-// May 2026 bar chart data — sorted descending
-const mayPartners = ['Namesilo','Bluehost','Crazy Domains','Name.com','HostGator US','Hostinger','HostGator LatAm'];
-const mayData     = [41.35, 32.80, 32.13, 31.43, 31.15, 25.09, 20.70];
-const mayColors   = ['#16a34a','#0891b2','#7c3aed','#dc2626','#d97706','#4f46e5','#db2777'];
+// May 2026 bar chart data — sorted descending (let so refreshData can update)
+let mayPartners = ['Namesilo','Bluehost','Crazy Domains','Name.com','HostGator US','Hostinger','HostGator LatAm'];
+let mayData     = [41.35, 32.80, 32.13, 31.43, 31.15, 25.09, 20.70];
+let mayColors   = ['#16a34a','#0891b2','#7c3aed','#dc2626','#d97706','#4f46e5','#db2777'];
 
 function makeMayChart() {
   return new Chart(document.getElementById('c7'), {
@@ -189,6 +204,21 @@ function makeMayChart() {
 }
 
 const charts = [];
+
+function buildTable(idx, data, lbs) {
+  const rows = data.map((v, j) => {
+    let mom = '—', cls = 'neutral';
+    if (j > 0) {
+      const diff = (v - data[j-1]).toFixed(2);
+      if (diff > 0)      { mom = `▲ ${diff}pp`; cls = 'up'; }
+      else if (diff < 0) { mom = `▼ ${Math.abs(diff)}pp`; cls = 'down'; }
+      else               { mom = '— 0pp'; }
+    }
+    return `<tr><td>${lbs[j]}</td><td>${v}%</td><td class="${cls}">${mom}</td></tr>`;
+  }).join('');
+  document.getElementById('t' + idx).innerHTML =
+    `<table><thead><tr><th>Month</th><th>P/U Conversion %</th><th>MoM Change</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
 
 // Defer all chart init to after first layout so containers have real widths
 requestAnimationFrame(() => {
@@ -245,24 +275,7 @@ partners.forEach((p, i) => {
     }
   }));
 
-  // build table
-  const rows = p.data.map((v, j) => {
-    let mom = '—';
-    let cls = 'neutral';
-    if (j > 0) {
-      const diff = (v - p.data[j-1]).toFixed(2);
-      if (diff > 0)      { mom = `▲ ${diff}pp`; cls = 'up'; }
-      else if (diff < 0) { mom = `▼ ${Math.abs(diff)}pp`; cls = 'down'; }
-      else               { mom = '— 0pp'; cls = 'neutral'; }
-    }
-    return `<tr><td>${labels[j]}</td><td>${v}%</td><td class="${cls}">${mom}</td></tr>`;
-  }).join('');
-
-  document.getElementById('t' + i).innerHTML = `
-    <table>
-      <thead><tr><th>Month</th><th>P/U Conversion %</th><th>MoM Change</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+  buildTable(i, p.data, labels);
 });
 
 }); // end requestAnimationFrame
@@ -283,6 +296,80 @@ function showTab(idx) {
       charts[idx].update('none');
     }
   }, 50);
+}
+
+function formatMonth(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
+async function refreshData() {
+  const btn = document.getElementById('refresh-btn');
+  const overlay = document.getElementById('loading-overlay');
+  btn.disabled = true;
+  btn.textContent = '↻ Refreshing…';
+  overlay.style.display = 'flex';
+
+  try {
+    const res = await fetch('http://localhost:5002/api/pu-data');
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const json = await res.json();
+
+    // Format labels, mark last as partial month
+    const newLabels = json.labels.map(formatMonth);
+    newLabels[newLabels.length - 1] += '*';
+
+    // Update each line chart + table
+    json.partners.forEach((p, i) => {
+      if (charts[i]) {
+        charts[i].data.labels = newLabels;
+        charts[i].data.datasets[0].data = p.data;
+        charts[i].update();
+      }
+      buildTable(i, p.data, newLabels);
+    });
+
+    // Build summary bar for previous complete month (second-to-last)
+    const prevIdx = json.labels.length - 2;
+    const prevLabel = formatMonth(json.labels[prevIdx]);
+    const sorted = json.partners
+      .map(p => ({ name: p.name, val: p.data[prevIdx], color: p.color }))
+      .sort((a, b) => b.val - a.val);
+    mayPartners = sorted.map(d => d.name);
+    mayData     = sorted.map(d => d.val);
+    mayColors   = sorted.map(d => d.color);
+
+    if (charts[7]) {
+      charts[7].data.labels = mayPartners;
+      charts[7].data.datasets[0].data = mayData;
+      charts[7].data.datasets[0].backgroundColor = mayColors.map(c => c + 'cc');
+      charts[7].data.datasets[0].borderColor = mayColors;
+      charts[7].update();
+    }
+
+    // Update tab label + panel heading to reflect the new prev month
+    document.querySelectorAll('.tab-btn')[7].textContent = `▦ ${prevLabel}`;
+    document.querySelector('#tab-7 .partner-label').textContent = `${prevLabel} — All Partners`;
+    document.querySelector('#tab-7 thead tr th:last-child').textContent = `P/U Conversion % (${prevLabel})`;
+
+    // Update static table rows in tab-7
+    const tbody = document.querySelector('#tab-7 tbody');
+    tbody.innerHTML = sorted.map(d =>
+      `<tr><td>${d.name}</td><td>${d.val.toFixed(2)}%</td></tr>`
+    ).join('');
+
+    // Update subtitle
+    const ts = new Date(json.updatedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false });
+    document.getElementById('subtitle').textContent =
+      `P/U Conversion % · ${newLabels[0].replace('*','')}–${newLabels[newLabels.length-1].replace('*','')} · Excl. Migration · Mailbox created = 1 applied to Bluehost & HostGator US only · Updated ${ts} IST`;
+
+  } catch (err) {
+    alert('Could not fetch data.\n\n' + err.message + '\n\nMake sure the API server is running:\n  python3 data_api.py');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '↻ Refresh Data';
+    overlay.style.display = 'none';
+  }
 }
 </script>
 </body>
