@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>P/U Uptake Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 24px; }
+  h1 { color: #1a202c; font-size: 20px; margin-bottom: 4px; }
+  .subtitle { color: #718096; font-size: 12px; margin-bottom: 20px; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 0; }
+  .tab-btn {
+    padding: 9px 16px; border: none; border-radius: 8px 8px 0 0;
+    background: #e2e8f0; color: #4a5568; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .tab-btn:hover { background: #cbd5e0; }
+  .tab-btn.active { background: #fff; color: #4f46e5; }
+
+  .card { background: #fff; border-radius: 0 8px 8px 8px; padding: 28px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .chart-wrap { position: relative; height: 360px; margin-bottom: 24px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f7fafc; color: #4a5568; text-align: left; padding: 8px 14px; font-weight: 600; }
+  td { padding: 8px 14px; border-bottom: 1px solid #edf2f7; color: #2d3748; }
+  tr:last-child td { border-bottom: none; }
+  td.up { color: #38a169; font-weight: 600; }
+  td.down { color: #e53e3e; font-weight: 600; }
+  td.neutral { color: #718096; }
+
+  .partner-label { font-size: 15px; font-weight: 700; color: #2d3748; margin-bottom: 18px; }
+  .note { font-size: 11px; color: #a0aec0; margin-top: 10px; }
+  .tag { display:inline-block; font-size:11px; background:#edf2f7; color:#4a5568; border-radius:4px; padding:2px 7px; margin-left:8px; font-weight:400; }
+</style>
+</head>
+<body>
+
+<h1>Premium &amp; Ultra Plan Uptake Dashboard</h1>
+<p class="subtitle">P/U Conversion % · Dec 2025–Jun 2026 · Excl. Migration · Mailbox created = 1 applied to Bluehost &amp; HostGator US only</p>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab(0)">Hostinger</button>
+  <button class="tab-btn" onclick="showTab(1)">Bluehost</button>
+  <button class="tab-btn" onclick="showTab(2)">HostGator US</button>
+  <button class="tab-btn" onclick="showTab(3)">Namesilo</button>
+  <button class="tab-btn" onclick="showTab(4)">Name.com</button>
+  <button class="tab-btn" onclick="showTab(5)">Crazy Domains</button>
+  <button class="tab-btn" onclick="showTab(6)">HostGator LatAm</button>
+  <button class="tab-btn" onclick="showTab(7)" style="background:#4f46e5;color:#fff;border-radius:8px 8px 0 0;">▦ May 2026</button>
+</div>
+
+<div class="card">
+
+  <div class="tab-panel active" id="tab-0">
+    <div class="partner-label">Hostinger</div>
+    <div class="chart-wrap"><canvas id="c0"></canvas></div>
+    <div id="t0"></div>
+    <p class="note">* Jun 2026 is a partial month (data as of Jun 11)</p>
+  </div>
+
+  <div class="tab-panel" id="tab-1">
+    <div class="partner-label">Bluehost</div>
+    <div class="chart-wrap"><canvas id="c1"></canvas></div>
+    <div id="t1"></div>
+    <p class="note">* Jun 2026 is a partial month (data as of Jun 11)</p>
+  </div>
+
+  <div class="tab-panel" id="tab-2">
+    <div class="partner-label">HostGator US</div>
+    <div class="chart-wrap"><canvas id="c2"></canvas></div>
+    <div id="t2"></div>
+    <p class="note">* Jun 2026 is a partial month (data as of Jun 11)</p>
+  </div>
+
+  <div class="tab-panel" id="tab-3">
+    <div class="partner-label">Namesilo</div>
+    <div class="chart-wrap"><canvas id="c3"></canvas></div>
+    <div id="t3"></div>
+    <p class="note">* Jun 2026 is a partial month (data as of Jun 11)</p>
+  </div>
+
+  <div class="tab-panel" id="tab-4">
+    <div class="partner-label">Name.com</div>
+    <div class="chart-wrap"><canvas id="c4"></canvas></div>
+    <div id="t4"></div>
+    <p class="note">* Jun 2026 is a partial month (data as of Jun 11)</p>
+  </div>
+
+  <div class="tab-panel" id="tab-5">
+    <div class="partner-label">Crazy Domains</div>
+    <div class="chart-wrap"><canvas id="c5"></canvas></div>
+    <div id="t5"></div>
+    <p class="note">* Jun 2026 is a partial month (data as of Jun 11)</p>
+  </div>
+
+  <div class="tab-panel" id="tab-6">
+    <div class="partner-label">HostGator LatAm <span class="tag">LatAm · Brazil · Mexico · Colombia · Chile</span></div>
+    <div class="chart-wrap"><canvas id="c6"></canvas></div>
+    <div id="t6"></div>
+    <p class="note">* Jun 2026 is a partial month (data as of Jun 11)</p>
+  </div>
+
+  <div class="tab-panel" id="tab-7">
+    <div class="partner-label">May 2026 — All Partners</div>
+    <div class="chart-wrap" style="height:380px"><canvas id="c7"></canvas></div>
+    <table style="margin-top:8px">
+      <thead><tr><th>Partner</th><th>P/U Conversion % (May 2026)</th></tr></thead>
+      <tbody>
+        <tr><td>Namesilo</td><td>41.35%</td></tr>
+        <tr><td>Bluehost</td><td>32.80%</td></tr>
+        <tr><td>Crazy Domains</td><td>32.13%</td></tr>
+        <tr><td>Name.com</td><td>31.43%</td></tr>
+        <tr><td>HostGator US</td><td>31.15%</td></tr>
+        <tr><td>Hostinger</td><td>25.09%</td></tr>
+        <tr><td>HostGator LatAm</td><td>20.70%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+const labels = ['Dec 2025','Jan 2026','Feb 2026','Mar 2026','Apr 2026','May 2026','Jun 2026*'];
+
+const partners = [
+  { name: 'Hostinger',        data: [25.01, 23.40, 25.79, 25.30, 25.31, 25.09, 23.75], color: '#4f46e5', mbx: false },
+  { name: 'Bluehost',         data: [23.03, 26.89, 25.16, 28.55, 28.52, 32.80, 38.12], color: '#0891b2', mbx: true  },
+  { name: 'HostGator US',     data: [26.56, 28.72, 26.03, 30.76, 33.04, 31.15, 37.41], color: '#d97706', mbx: true  },
+  { name: 'Namesilo',         data: [35.93, 38.17, 38.87, 34.82, 39.82, 41.35, 40.92], color: '#16a34a', mbx: false },
+  { name: 'Name.com',         data: [26.73, 34.22, 30.99, 33.57, 36.03, 31.43, 30.51], color: '#dc2626', mbx: false },
+  { name: 'Crazy Domains',    data: [27.97, 29.50, 30.94, 31.14, 27.65, 32.13, 27.97], color: '#7c3aed', mbx: false },
+  { name: 'HostGator LatAm',  data: [16.33, 19.86, 17.54, 18.73, 19.35, 20.70, 20.30], color: '#db2777', mbx: false },
+];
+
+// May 2026 bar chart data — sorted descending
+const mayPartners = ['Namesilo','Bluehost','Crazy Domains','Name.com','HostGator US','Hostinger','HostGator LatAm'];
+const mayData     = [41.35, 32.80, 32.13, 31.43, 31.15, 25.09, 20.70];
+const mayColors   = ['#16a34a','#0891b2','#7c3aed','#dc2626','#d97706','#4f46e5','#db2777'];
+
+function makeMayChart() {
+  return new Chart(document.getElementById('c7'), {
+    type: 'bar',
+    data: {
+      labels: mayPartners,
+      datasets: [{
+        label: 'P/U Conversion %',
+        data: mayData,
+        backgroundColor: mayColors.map(c => c + 'cc'),
+        borderColor: mayColors,
+        borderWidth: 2,
+        borderRadius: 6,
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          offset: 2,
+          color: '#1a202c',
+          font: { size: 12, weight: '700' },
+          formatter: v => v + '%'
+        }
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 32 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}%` } },
+        datalabels: {}
+      },
+      scales: {
+        y: {
+          min: 0, max: 50,
+          ticks: { callback: v => v + '%', font: { size: 12 } },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        x: { grid: { display: false }, ticks: { font: { size: 12 } } }
+      }
+    }
+  });
+}
+
+const charts = [];
+
+// Defer all chart init to after first layout so containers have real widths
+requestAnimationFrame(() => {
+partners.forEach((p, i) => {
+  const min = Math.max(0, Math.floor(Math.min(...p.data) - 5));
+  const max = Math.ceil(Math.max(...p.data) + 6);
+
+  const ctx = document.getElementById('c' + i);
+  charts.push(new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'P/U Conversion %',
+        data: p.data,
+        borderColor: p.color,
+        backgroundColor: p.color + '18',
+        borderWidth: 2.5,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointBackgroundColor: '#fff',
+        pointBorderColor: p.color,
+        pointBorderWidth: 2.5,
+        fill: true,
+        tension: 0.3,
+        datalabels: {
+          anchor: 'center',
+          align: ctx => ctx.dataIndex % 2 === 0 ? 'top' : 'bottom',
+          offset: 8,
+          color: p.color,
+          font: { size: 11, weight: '700' },
+          formatter: v => v + '%',
+          display: true
+        }
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 36, left: 8, right: 8 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}%` } },
+        datalabels: {}
+      },
+      scales: {
+        y: {
+          min, max,
+          ticks: { callback: v => v + '%', font: { size: 12 } },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        x: { grid: { display: false }, ticks: { font: { size: 12 } } }
+      }
+    }
+  }));
+
+  // build table
+  const rows = p.data.map((v, j) => {
+    let mom = '—';
+    let cls = 'neutral';
+    if (j > 0) {
+      const diff = (v - p.data[j-1]).toFixed(2);
+      if (diff > 0)      { mom = `▲ ${diff}pp`; cls = 'up'; }
+      else if (diff < 0) { mom = `▼ ${Math.abs(diff)}pp`; cls = 'down'; }
+      else               { mom = '— 0pp'; cls = 'neutral'; }
+    }
+    return `<tr><td>${labels[j]}</td><td>${v}%</td><td class="${cls}">${mom}</td></tr>`;
+  }).join('');
+
+  document.getElementById('t' + i).innerHTML = `
+    <table>
+      <thead><tr><th>Month</th><th>P/U Conversion %</th><th>MoM Change</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+});
+
+}); // end requestAnimationFrame
+
+function showTab(idx) {
+  document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  setTimeout(() => {
+    if (idx === 7) {
+      if (!charts[7]) {
+        charts[7] = makeMayChart();
+      } else {
+        charts[7].resize();
+        charts[7].update('none');
+      }
+    } else if (charts[idx]) {
+      charts[idx].resize();
+      charts[idx].update('none');
+    }
+  }, 50);
+}
+</script>
+</body>
+</html>
