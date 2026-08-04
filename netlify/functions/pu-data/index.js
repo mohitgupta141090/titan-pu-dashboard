@@ -97,9 +97,14 @@ exports.handler = async (event) => {
       throw new Error(`Missing credentials. TITAN_AWS_ACCESS_KEY_ID=${!!accessKeyId} TITAN_AWS_SECRET_ACCESS_KEY=${!!secretAccessKey}`);
     }
 
+    const sessionToken = process.env.TITAN_AWS_SESSION_TOKEN;
     const client = new AthenaClient({
       region: process.env.TITAN_AWS_REGION || REGION,
-      credentials: { accessKeyId, secretAccessKey },
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+        ...(sessionToken && { sessionToken }),
+      },
     });
 
     // Run all 7 partner queries in parallel
