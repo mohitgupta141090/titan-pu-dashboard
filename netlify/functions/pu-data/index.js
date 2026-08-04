@@ -115,10 +115,11 @@ exports.handler = async (event) => {
       body: JSON.stringify({ labels, partners, updatedAt: new Date().toISOString() }),
     };
   } catch (err) {
+    console.error("Function error:", err.message, err.stack);
     return {
       statusCode: 500,
       headers: CORS,
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: err.message, stack: err.stack }),
     };
   }
 };
