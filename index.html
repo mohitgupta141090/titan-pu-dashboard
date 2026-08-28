@@ -11,9 +11,6 @@
   h1 { color: #1a202c; font-size: 20px; margin-bottom: 4px; }
   .subtitle { color: #718096; font-size: 12px; }
   .header-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 16px; }
-  .refresh-btn { padding: 8px 18px; background: #4f46e5; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-  .refresh-btn:hover { background: #4338ca; }
-  .refresh-btn:disabled { opacity: 0.6; cursor: not-allowed; }
   #loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.88); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
   #loading-overlay p { color: #4a5568; font-size: 14px; font-weight: 500; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -54,9 +51,9 @@
 <div class="header-row">
   <div>
     <h1>Premium &amp; Ultra Plan Uptake Dashboard</h1>
-    <p class="subtitle" id="subtitle">P/U Conversion % · Dec 2025–Jun 2026 · Excl. Migration · Mailbox created = 1 applied to Bluehost &amp; HostGator US only</p>
+    <p class="subtitle" id="subtitle">P/U Conversion % &middot; Feb 2026&ndash;Aug 2026* &middot; Excl. Migration &middot; Mailbox created = 1 applied to Bluehost &amp; HostGator US only</p>
   </div>
-  <button class="refresh-btn" id="refresh-btn" onclick="refreshData()">↻ Refresh Data</button>
+
 </div>
 
 <div class="tabs">
@@ -67,7 +64,7 @@
   <button class="tab-btn" onclick="showTab(4)">Name.com</button>
   <button class="tab-btn" onclick="showTab(5)">Crazy Domains</button>
   <button class="tab-btn" onclick="showTab(6)">HostGator LatAm</button>
-  <button class="tab-btn" onclick="showTab(7)" style="background:#4f46e5;color:#fff;border-radius:8px 8px 0 0;">▦ May 2026</button>
+  <button class="tab-btn" onclick="showTab(7)" style="background:#4f46e5;color:#fff;border-radius:8px 8px 0 0;">Aug 2026</button>
 </div>
 
 <div class="card">
@@ -143,22 +140,22 @@
 <script>
 Chart.register(ChartDataLabels);
 
-const labels = ['Dec 2025','Jan 2026','Feb 2026','Mar 2026','Apr 2026','May 2026','Jun 2026*'];
+const labels = ["Feb 2026", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026", "Jul 2026", "Aug 2026*"];
 
 const partners = [
-  { name: 'Hostinger',        data: [25.01, 23.40, 25.79, 25.30, 25.31, 25.09, 23.75], color: '#4f46e5', mbx: false },
-  { name: 'Bluehost',         data: [23.03, 26.89, 25.16, 28.55, 28.52, 32.80, 38.12], color: '#0891b2', mbx: true  },
-  { name: 'HostGator US',     data: [26.56, 28.72, 26.03, 30.76, 33.04, 31.15, 37.41], color: '#d97706', mbx: true  },
-  { name: 'Namesilo',         data: [35.93, 38.17, 38.87, 34.82, 39.82, 41.35, 40.92], color: '#16a34a', mbx: false },
-  { name: 'Name.com',         data: [26.73, 34.22, 30.99, 33.57, 36.03, 31.43, 30.51], color: '#dc2626', mbx: false },
-  { name: 'Crazy Domains',    data: [27.97, 29.50, 30.94, 31.14, 27.65, 32.13, 27.97], color: '#7c3aed', mbx: false },
-  { name: 'HostGator LatAm',  data: [16.33, 19.86, 17.54, 18.73, 19.35, 20.70, 20.30], color: '#db2777', mbx: false },
+  { name: 'Hostinger',        data: [25.79, 25.25, 25.35, 25.08, 23.38, 27.14, 24.45], color: '#4f46e5', mbx: false },
+  { name: 'Bluehost',         data: [24.61, 27.93, 27.9, 31.34, 34.52, 36.9, 36.69], color: '#0891b2', mbx: true  },
+  { name: 'HostGator US',     data: [25.18, 29.48, 31.85, 30.6, 38.79, 40.05, 35.68], color: '#d97706', mbx: true  },
+  { name: 'Namesilo',         data: [38.87, 34.82, 39.81, 41.35, 37.85, 39.62, 36.79], color: '#16a34a', mbx: false },
+  { name: 'Name.com',         data: [31.4, 33.74, 35.99, 31.34, 32.77, 38.97, 41.9], color: '#dc2626', mbx: false },
+  { name: 'Crazy Domains',    data: [30.94, 31.11, 27.65, 32.13, 29.11, 33.46, 33.0], color: '#7c3aed', mbx: false },
+  { name: 'HostGator LatAm',  data: [17.5, 18.72, 19.15, 20.68, 18.9, 17.38, 19.81], color: '#db2777', mbx: false },
 ];
 
 // May 2026 bar chart data — sorted descending (let so refreshData can update)
-let mayPartners = ['Namesilo','Bluehost','Crazy Domains','Name.com','HostGator US','Hostinger','HostGator LatAm'];
-let mayData     = [41.35, 32.80, 32.13, 31.43, 31.15, 25.09, 20.70];
-let mayColors   = ['#16a34a','#0891b2','#7c3aed','#dc2626','#d97706','#4f46e5','#db2777'];
+let mayPartners = ["Name.com", "Namesilo", "Bluehost", "HostGator US", "Crazy Domains", "Hostinger", "HostGator LatAm"];
+let mayData     = [41.9, 36.79, 36.69, 35.68, 33.0, 24.45, 19.81];
+let mayColors   = ["#dc2626", "#16a34a", "#0891b2", "#d97706", "#7c3aed", "#4f46e5", "#db2777"];
 
 function makeMayChart() {
   return new Chart(document.getElementById('c7'), {
@@ -303,77 +300,7 @@ function formatMonth(dateStr) {
   return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
-async function refreshData() {
-  const btn = document.getElementById('refresh-btn');
-  const overlay = document.getElementById('loading-overlay');
-  btn.disabled = true;
-  btn.textContent = '↻ Refreshing…';
-  overlay.style.display = 'flex';
 
-  try {
-    const res = await fetch('/.netlify/functions/pu-data');
-    if (!res.ok) {
-      const errBody = await res.text();
-      throw new Error(`API error ${res.status}: ${errBody}`);
-    }
-    const json = await res.json();
-
-    // Format labels, mark last as partial month
-    const newLabels = json.labels.map(formatMonth);
-    newLabels[newLabels.length - 1] += '*';
-
-    // Update each line chart + table
-    json.partners.forEach((p, i) => {
-      if (charts[i]) {
-        charts[i].data.labels = newLabels;
-        charts[i].data.datasets[0].data = p.data;
-        charts[i].update();
-      }
-      buildTable(i, p.data, newLabels);
-    });
-
-    // Build summary bar for previous complete month (second-to-last)
-    const prevIdx = json.labels.length - 2;
-    const prevLabel = formatMonth(json.labels[prevIdx]);
-    const sorted = json.partners
-      .map(p => ({ name: p.name, val: p.data[prevIdx], color: p.color }))
-      .sort((a, b) => b.val - a.val);
-    mayPartners = sorted.map(d => d.name);
-    mayData     = sorted.map(d => d.val);
-    mayColors   = sorted.map(d => d.color);
-
-    if (charts[7]) {
-      charts[7].data.labels = mayPartners;
-      charts[7].data.datasets[0].data = mayData;
-      charts[7].data.datasets[0].backgroundColor = mayColors.map(c => c + 'cc');
-      charts[7].data.datasets[0].borderColor = mayColors;
-      charts[7].update();
-    }
-
-    // Update tab label + panel heading to reflect the new prev month
-    document.querySelectorAll('.tab-btn')[7].textContent = `▦ ${prevLabel}`;
-    document.querySelector('#tab-7 .partner-label').textContent = `${prevLabel} — All Partners`;
-    document.querySelector('#tab-7 thead tr th:last-child').textContent = `P/U Conversion % (${prevLabel})`;
-
-    // Update static table rows in tab-7
-    const tbody = document.querySelector('#tab-7 tbody');
-    tbody.innerHTML = sorted.map(d =>
-      `<tr><td>${d.name}</td><td>${d.val.toFixed(2)}%</td></tr>`
-    ).join('');
-
-    // Update subtitle
-    const ts = new Date(json.updatedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false });
-    document.getElementById('subtitle').textContent =
-      `P/U Conversion % · ${newLabels[0].replace('*','')}–${newLabels[newLabels.length-1].replace('*','')} · Excl. Migration · Mailbox created = 1 applied to Bluehost & HostGator US only · Updated ${ts} IST`;
-
-  } catch (err) {
-    alert('Could not fetch data.\n\n' + err.message + '\n\nMake sure the API server is running:\n  python3 data_api.py');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '↻ Refresh Data';
-    overlay.style.display = 'none';
-  }
-}
 </script>
 </body>
 </html>
